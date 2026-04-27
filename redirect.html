@@ -1,1 +1,267 @@
-redirect.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nukrax — Loading</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --black:    #080808;
+      --white:    #f4f4f2;
+      --offwhite: #e8e8e6;
+      --muted:    #6b6b6b;
+      --steel:    #3a3a3a;
+      --mid:      #222222;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      animation: grain 0.5s steps(1) infinite;
+    }
+    @keyframes grain {
+      0%,100%{transform:translate(0,0)}
+      10%{transform:translate(-2%,-3%)}
+      20%{transform:translate(3%,2%)}
+      30%{transform:translate(-1%,4%)}
+      40%{transform:translate(4%,-1%)}
+      50%{transform:translate(-3%,3%)}
+      60%{transform:translate(2%,-4%)}
+      70%{transform:translate(-4%,2%)}
+      80%{transform:translate(3%,1%)}
+      90%{transform:translate(-2%,-2%)}
+    }
+
+    /* Full-screen wipe curtain */
+    .curtain {
+      position: fixed;
+      inset: 0;
+      background: var(--offwhite);
+      z-index: 50;
+      transform-origin: left center;
+      animation: curtainIn 0.6s cubic-bezier(0.7, 0, 0.3, 1) 0.05s both,
+                 curtainOut 0.6s cubic-bezier(0.7, 0, 0.3, 1) 1.4s both;
+    }
+
+    @keyframes curtainIn {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    @keyframes curtainOut {
+      from { transform: scaleX(1); transform-origin: right center; }
+      to   { transform: scaleX(0); transform-origin: right center; }
+    }
+
+    /* Inner content */
+    .redirect-wrap {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .redirect-logo {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      filter: brightness(0.9);
+      margin-bottom: 32px;
+      animation: logoSpin 2s ease-in-out infinite;
+    }
+
+    .redirect-logo-fallback {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      letter-spacing: 0.08em;
+      color: var(--offwhite);
+      margin-bottom: 32px;
+      display: none;
+    }
+
+    @keyframes logoSpin {
+      0%, 100% { transform: rotate(-2deg) scale(1); }
+      50% { transform: rotate(2deg) scale(1.04); }
+    }
+
+    /* Wordmark */
+    .redirect-wordmark {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 10vw, 96px);
+      letter-spacing: 0.06em;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    /* Status line */
+    .redirect-status {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    /* Progress bar */
+    .progress-track {
+      width: 200px;
+      height: 1px;
+      background: var(--steel);
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      background: var(--offwhite);
+      width: 0%;
+      animation: progress 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+
+    @keyframes progress {
+      0%   { width: 0%; }
+      40%  { width: 55%; }
+      100% { width: 100%; }
+    }
+
+    /* Corner decorations */
+    .corner {
+      position: fixed;
+      width: 24px; height: 24px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .corner::before, .corner::after {
+      content: '';
+      position: absolute;
+      background: var(--steel);
+    }
+    .corner::before { width: 1px; height: 100%; }
+    .corner::after  { width: 100%; height: 1px; }
+    .corner-tl { top: 24px; left: 24px; }
+    .corner-tr { top: 24px; right: 24px; transform: rotate(90deg); }
+    .corner-bl { bottom: 24px; left: 24px; transform: rotate(-90deg); }
+    .corner-br { bottom: 24px; right: 24px; transform: rotate(180deg); }
+
+    /* URL badge */
+    .redirect-url {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--steel);
+      text-transform: lowercase;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Wipe curtain -->
+  <div class="curtain"></div>
+
+  <!-- Corner brackets -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <!-- Main content -->
+  <div class="redirect-wrap">
+    <img
+      src="assets/logo.png"
+      alt="nukrax"
+      class="redirect-logo"
+      id="rLogo"
+      onerror="this.style.display='none'; document.getElementById('rLogoFallback').style.display='block';"
+    />
+    <p class="redirect-logo-fallback" id="rLogoFallback">nukrax</p>
+    <p class="redirect-wordmark">nukrax</p>
+    <p class="redirect-status" id="statusText">Entering the space</p>
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+
+  <p class="redirect-url">nukrax.sh</p>
+
+  <script>
+    // Parse destination from query string
+    function getDestination() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('to') || 'home.html';
+    }
+
+    const dest = getDestination();
+
+    // Status messages that cycle
+    const messages = [
+      'Entering the space',
+      'Loading the drop',
+      'Almost there'
+    ];
+    let msgIdx = 0;
+    const statusEl = document.getElementById('statusText');
+
+    const msgInterval = setInterval(() => {
+      msgIdx = (msgIdx + 1) % messages.length;
+      statusEl.textContent = messages[msgIdx];
+    }, 500);
+
+    // Navigate after animation completes (curtain in + slight hold + curtain out = ~2s)
+    setTimeout(() => {
+      clearInterval(msgInterval);
+      window.location.replace(dest);
+    }, 2000);
+
+    // Handle browser back button — always go back to index.html
+    window.addEventListener('popstate', () => {
+      window.location.replace('index.html');
+    });
+
+    // Push a state so back button can be intercepted
+    history.pushState({ redirect: true }, '', window.location.href);
+  </script>
+</body>
+</html>
